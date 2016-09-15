@@ -9,29 +9,18 @@ public class PlayerBehavior : MonoBehaviour {
 
     public float Speed;
 
-    public enum RotationAxes { MouseXAndY = 0, MouseX = 1, MouseY = 2 }
-    public RotationAxes axes = RotationAxes.MouseXAndY;
-    public float sensitivityX = 15F;
-    public float sensitivityY = 15F;
+    Vector2 _mouseAbsolute;
+    Vector2 _smoothMouse;
 
-    public float minimumX = -360F;
-    public float maximumX = 360F;
+    public Vector2 clampInDegrees = new Vector2(360, 180);
+    public Vector2 sensitivity = new Vector2(2, 2);
+    public Vector2 smoothing = new Vector2(3, 3);
+    public Vector2 targetDirection;
+    public Vector2 targetCharacterDirection;
 
-    public float minimumY = -60F;
-    public float maximumY = 60F;
-
-    float rotationX = 0F;
-    float rotationY = 0F;
-
-    private List<float> rotArrayX = new List<float>();
-    float rotAverageX = 0F;
-
-    private List<float> rotArrayY = new List<float>();
-    float rotAverageY = 0F;
-
-    public float frameCounter = 20;
-
-    Quaternion originalRotation;
+    // Assign this if there's a parent object controlling motion, such as a Character Controller.
+    // Yaw rotation will affect this object instead of the camera if set.
+    public GameObject characterBody;
 
     // Use this for initialization
     void Start () {
@@ -41,10 +30,11 @@ public class PlayerBehavior : MonoBehaviour {
             Debug.Log("HMD detected, setting to VR");
         }
 
-        Rigidbody rb = GetComponent<Rigidbody>();
-        if (rb)
-            rb.freezeRotation = true;
-        originalRotation = transform.localRotation;
+        // Set target direction to the camera's initial orientation.
+        targetDirection = transform.localRotation.eulerAngles;
+
+        // Set target direction for the character body to its inital state.
+        if (characterBody) targetCharacterDirection = characterBody.transform.localRotation.eulerAngles;
     }
 	
 	// Update is called once per frame
@@ -61,108 +51,71 @@ public class PlayerBehavior : MonoBehaviour {
         float v = Input.GetAxis("Vertical") * Speed * Time.deltaTime;
 
         if (Input.GetKey(KeyCode.A)) {
-            transform.position -= transform.right * Time.deltaTime * Speed;
+            Vector3 transformVector = transform.right * Time.deltaTime * Speed;
+            transformVector.y = 0;
+            transform.position -= transformVector;
         }
         else if (Input.GetKey(KeyCode.D)) {
-            transform.position += transform.right * Time.deltaTime * Speed;
+            Vector3 transformVector = transform.right * Time.deltaTime * Speed;
+            transformVector.y = 0;
+            transform.position += transformVector;
         }
 
         if (Input.GetKey(KeyCode.W)) {
-            transform.position += transform.forward * Time.deltaTime * Speed;
+            Vector3 transformVector = transform.forward * Time.deltaTime * Speed;
+            transformVector.y = 0;
+            transform.position += transformVector;
         }
         else if (Input.GetKey(KeyCode.S)) {
-            transform.position -= transform.forward * Time.deltaTime * Speed;
+            Vector3 transformVector = transform.forward * Time.deltaTime * Speed;
+            transformVector.y = 0;
+            transform.position -= transformVector;
         }
     }
 
     private void updateMouseLook() {
-        if (axes == RotationAxes.MouseXAndY) {
-            rotAverageY = 0f;
-            rotAverageX = 0f;
 
-            rotationY += Input.GetAxis("Mouse Y") * sensitivityY;
-            rotationX += Input.GetAxis("Mouse X") * sensitivityX;
+        //ensure these stay this way
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
 
-            rotArrayY.Add(rotationY);
-            rotArrayX.Add(rotationX);
+        // Allow the script to clamp based on a desired target value.
+        var targetOrientation = Quaternion.Euler(targetDirection);
+        var targetCharacterOrientation = Quaternion.Euler(targetCharacterDirection);
 
-            if (rotArrayY.Count >= frameCounter) {
-                rotArrayY.RemoveAt(0);
-            }
-            if (rotArrayX.Count >= frameCounter) {
-                rotArrayX.RemoveAt(0);
-            }
+        // Get raw mouse input for a cleaner reading on more sensitive mice.
+        var mouseDelta = new Vector2(Input.GetAxisRaw("Mouse X"), Input.GetAxisRaw("Mouse Y"));
 
-            for (int j = 0; j < rotArrayY.Count; j++) {
-                rotAverageY += rotArrayY[j];
-            }
-            for (int i = 0; i < rotArrayX.Count; i++) {
-                rotAverageX += rotArrayX[i];
-            }
+        // Scale input against the sensitivity setting and multiply that against the smoothing value.
+        mouseDelta = Vector2.Scale(mouseDelta, new Vector2(sensitivity.x * smoothing.x, sensitivity.y * smoothing.y));
 
-            rotAverageY /= rotArrayY.Count;
-            rotAverageX /= rotArrayX.Count;
+        // Interpolate mouse movement over time to apply smoothing delta.
+        _smoothMouse.x = Mathf.Lerp(_smoothMouse.x, mouseDelta.x, 1f / smoothing.x);
+        _smoothMouse.y = Mathf.Lerp(_smoothMouse.y, mouseDelta.y, 1f / smoothing.y);
 
-            rotAverageY = ClampAngle(rotAverageY, minimumY, maximumY);
-            rotAverageX = ClampAngle(rotAverageX, minimumX, maximumX);
+        // Find the absolute mouse movement value from point zero.
+        _mouseAbsolute += _smoothMouse;
 
-            Quaternion yQuaternion = Quaternion.AngleAxis(rotAverageY, Vector3.left);
-            Quaternion xQuaternion = Quaternion.AngleAxis(rotAverageX, Vector3.up);
+        // Clamp and apply the local x value first, so as not to be affected by world transforms.
+        if (clampInDegrees.x < 360)
+            _mouseAbsolute.x = Mathf.Clamp(_mouseAbsolute.x, -clampInDegrees.x * 0.5f, clampInDegrees.x * 0.5f);
 
-            transform.localRotation = originalRotation * xQuaternion * yQuaternion;
-        }
-        else if (axes == RotationAxes.MouseX) {
-            rotAverageX = 0f;
+        // Then clamp and apply the global y value.
+        if (clampInDegrees.y < 360)
+            _mouseAbsolute.y = Mathf.Clamp(_mouseAbsolute.y, -clampInDegrees.y * 0.5f, clampInDegrees.y * 0.5f);
 
-            rotationX += Input.GetAxis("Mouse X") * sensitivityX;
+        var xRotation = Quaternion.AngleAxis(-_mouseAbsolute.y, targetOrientation * Vector3.right);
+        transform.localRotation = xRotation * targetOrientation;
 
-            rotArrayX.Add(rotationX);
-
-            if (rotArrayX.Count >= frameCounter) {
-                rotArrayX.RemoveAt(0);
-            }
-            for (int i = 0; i < rotArrayX.Count; i++) {
-                rotAverageX += rotArrayX[i];
-            }
-            rotAverageX /= rotArrayX.Count;
-
-            rotAverageX = ClampAngle(rotAverageX, minimumX, maximumX);
-
-            Quaternion xQuaternion = Quaternion.AngleAxis(rotAverageX, Vector3.up);
-            transform.localRotation = originalRotation * xQuaternion;
+        // If there's a character body that acts as a parent to the camera
+        if (characterBody) {
+            var yRotation = Quaternion.AngleAxis(_mouseAbsolute.x, characterBody.transform.up);
+            characterBody.transform.localRotation = yRotation;
+            characterBody.transform.localRotation *= targetCharacterOrientation;
         }
         else {
-            rotAverageY = 0f;
-
-            rotationY += Input.GetAxis("Mouse Y") * sensitivityY;
-
-            rotArrayY.Add(rotationY);
-
-            if (rotArrayY.Count >= frameCounter) {
-                rotArrayY.RemoveAt(0);
-            }
-            for (int j = 0; j < rotArrayY.Count; j++) {
-                rotAverageY += rotArrayY[j];
-            }
-            rotAverageY /= rotArrayY.Count;
-
-            rotAverageY = ClampAngle(rotAverageY, minimumY, maximumY);
-
-            Quaternion yQuaternion = Quaternion.AngleAxis(rotAverageY, Vector3.left);
-            transform.localRotation = originalRotation * yQuaternion;
+            var yRotation = Quaternion.AngleAxis(_mouseAbsolute.x, transform.InverseTransformDirection(Vector3.up));
+            transform.localRotation *= yRotation;
         }
-    }
-
-    private float ClampAngle(float angle, float min, float max) {
-        angle = angle % 360;
-        if ((angle >= -360F) && (angle <= 360F)) {
-            if (angle < -360F) {
-                angle += 360F;
-            }
-            if (angle > 360F) {
-                angle -= 360F;
-            }
-        }
-        return Mathf.Clamp(angle, min, max);
     }
 }
