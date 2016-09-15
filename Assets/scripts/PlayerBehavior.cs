@@ -8,7 +8,6 @@ public class PlayerBehavior : MonoBehaviour {
     private GameManager manager;
 
     public float Speed;
-    public Vector3 Direction;
 
     public enum RotationAxes { MouseXAndY = 0, MouseX = 1, MouseY = 2 }
     public RotationAxes axes = RotationAxes.MouseXAndY;
@@ -57,28 +56,22 @@ public class PlayerBehavior : MonoBehaviour {
 	}
 
     private void updateDirectionalMovement() {
+
+        float h = Input.GetAxis("Horizontal") * Speed * Time.deltaTime;
+        float v = Input.GetAxis("Vertical") * Speed * Time.deltaTime;
+
         if (Input.GetKey(KeyCode.A)) {
-            Direction.x = -1;
+            transform.position -= transform.right * Time.deltaTime * Speed;
         }
         else if (Input.GetKey(KeyCode.D)) {
-            Direction.x = 1;
-        }
-        else {
-            Direction.x = 0;
+            transform.position += transform.right * Time.deltaTime * Speed;
         }
 
         if (Input.GetKey(KeyCode.W)) {
-            Direction.z = 1;
+            transform.position += transform.forward * Time.deltaTime * Speed;
         }
         else if (Input.GetKey(KeyCode.S)) {
-            Direction.z = -1;
-        }
-        else {
-            Direction.z = 0;
-        }
-
-        if (Direction.x != 0 || Direction.z != 0) {
-            transform.position += Direction.normalized * Speed * Time.deltaTime;
+            transform.position -= transform.forward * Time.deltaTime * Speed;
         }
     }
 
