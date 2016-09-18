@@ -28,14 +28,62 @@ Failed to create Oculus Session.Compositor failed to initialize.Failed to create
 (Filename:  Line: 312)
 
 [VRDevice] Successfully created device OpenVR.
-UnloadTime: 0.368925 ms
+UnloadTime: 0.412615 ms
 Connected to lighthouse:LHR-55857C81
  
 (Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebugBindings.gen.cpp Line: 42)
 
+HMD Detected, set to use VR
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebugBindings.gen.cpp Line: 42)
+
+Activating VR
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebugBindings.gen.cpp Line: 42)
+
 Setting up 2 worker threads for Enlighten.
-  Thread -> id: 2920 -> priority: 1 
-  Thread -> id: 3cf8 -> priority: 1 
+  Thread -> id: 27ec -> priority: 1 
+  Thread -> id: 32f8 -> priority: 1 
+Motion Controllers detected - Connecting devices
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebugBindings.gen.cpp Line: 42)
+
+Motion Controllers not detected - Disabling devices
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebugBindings.gen.cpp Line: 42)
+
+Motion Controllers detected - Connecting devices
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebugBindings.gen.cpp Line: 42)
+
+Motion Controllers not detected - Disabling devices
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebugBindings.gen.cpp Line: 42)
+
+Motion Controllers detected - Connecting devices
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebugBindings.gen.cpp Line: 42)
+
+Motion Controllers not detected - Disabling devices
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebugBindings.gen.cpp Line: 42)
+
+Motion Controllers detected - Connecting devices
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebugBindings.gen.cpp Line: 42)
+
+Motion Controllers not detected - Disabling devices
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebugBindings.gen.cpp Line: 42)
+
+Motion Controllers detected - Connecting devices
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebugBindings.gen.cpp Line: 42)
+
+Motion Controllers not detected - Disabling devices
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebugBindings.gen.cpp Line: 42)
+
 OpenVR Shutdown
  
 (Filename:  Line: 660)

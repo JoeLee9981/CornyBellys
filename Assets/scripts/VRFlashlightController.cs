@@ -4,12 +4,14 @@ using System.Collections;
 public class VRFlashlightController : MonoBehaviour {
 
     public GameObject flashLight;
-    public GameObject rightMotionController;
+    private GameManager manager;
 
 	// Use this for initialization
 	void Start () {
-        parentFlashlightToMotionControl();
-        VR_CustomTrackedController rc = rightMotionController.GetComponent<VR_CustomTrackedController>();
+        manager = GameManager.getInstance();
+        GameObject flashlightGameObject = GameObject.Find("Flashlight");
+        flashlightGameObject.SetActive(false);
+        VR_CustomTrackedController rc = manager.VRControllerRight.GetComponent<VR_CustomTrackedController>();
         rc.OnTriggerDown += OnTriggerDown;
     }
 	
@@ -17,11 +19,6 @@ public class VRFlashlightController : MonoBehaviour {
 	void Update () {
 	
 	}
-
-    private void parentFlashlightToMotionControl() {
-        GameObject flashlight = GameObject.Find("Flashlight");
-        flashlight.SetActive(false);
-    }
 
     public void OnTriggerDown(object sender, InputEventArgs e) {
         flashLight.SetActive(!flashLight.activeSelf);
