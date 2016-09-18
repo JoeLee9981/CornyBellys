@@ -6,8 +6,8 @@ using UnityStandardAssets.Characters.FirstPerson;
 public class GameController : MonoBehaviour {
 
     public GameManager manager;
-    public GameObject rightMotionController;
-    public GameObject leftMotionController;
+    [SerializeField] private GameObject rightMotionController;
+    [SerializeField] private GameObject leftMotionController;
     public GameObject playerCharacter;
     public GameObject motionFlashlight;
     public GameObject staticFlashlight;
@@ -21,6 +21,7 @@ public class GameController : MonoBehaviour {
             manager.UseVR = true;
         }
     }
+
 	// Use this for initialization
 	void Start () {
  

@@ -16,6 +16,9 @@ public class VR_CustomTrackedController : MonoBehaviour {
     public event InputEventHandler OnTriggerDown;
     public event InputEventHandler OnTrigger;
     public event InputEventHandler OnTriggerUp;
+    public event InputEventHandler OnGripDown;
+    public event InputEventHandler OnGrip;
+    public event InputEventHandler OnGripUp;
     public event InputEventHandler OnTouchPadTouched;
 
     // Use this for initialization
@@ -47,6 +50,18 @@ public class VR_CustomTrackedController : MonoBehaviour {
         }
     }
 
+    private void onGripDown(InputEventArgs e) {
+        if (OnGripDown != null) {
+            OnGripDown(this, e);
+        }
+    }
+
+    private void onGrip(InputEventArgs e) {
+        if(OnGrip != null) {
+            OnGrip(this, e);
+        }
+    }
+
     // Update is called once per frame
     void Update() {
 
@@ -72,6 +87,16 @@ public class VR_CustomTrackedController : MonoBehaviour {
             InputEventArgs e;
             e.touchpad = device.GetAxis();
             onTouchPadTouched(e);
+        }
+
+        if(device.GetPressDown(SteamVR_Controller.ButtonMask.Grip)) {
+
+        }
+        else if(device.GetPress(SteamVR_Controller.ButtonMask.Grip)) {
+
+        }
+        else if(device.GetPressUp(SteamVR_Controller.ButtonMask.Grip)) {
+
         }
     }
 
