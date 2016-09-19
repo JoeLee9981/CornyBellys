@@ -8,9 +8,10 @@ public class GameController : MonoBehaviour {
     public GameManager manager;
     [SerializeField] private GameObject rightMotionController;
     [SerializeField] private GameObject leftMotionController;
-    public GameObject playerCharacter;
-    public GameObject motionFlashlight;
-    public GameObject staticFlashlight;
+    [SerializeField] private GameObject playerCharacter;
+    [SerializeField] private GameObject vrCellPhone;
+    [SerializeField] private GameObject cellPhone;
+    [SerializeField] private GameObject playerCamera;
 
     void Awake() {
         manager = GameManager.getInstance();
@@ -34,18 +35,18 @@ public class GameController : MonoBehaviour {
                 Debug.Log("Activating VR");
                 manager.VRActive = true;
             }
-            /*if (!manager.MotionControlsConnected && leftMotionController.activeInHierarchy && rightMotionController.activeInHierarchy) {
-                 Debug.Log("Motion Controllers detected - Connecting devices");
-                 manager.MotionControlsConnected = true;
-                 playerCharacter.GetComponent<FirstPersonController>().enabled = false;
-                 playerCharacter.GetComponent<VRPlayerController>().enabled = true;
+            if (!manager.MotionControlsConnected && leftMotionController.activeInHierarchy && rightMotionController.activeInHierarchy) {
+                Debug.Log("Motion Controllers detected - Connecting devices");
+                manager.MotionControlsConnected = true;
+                cellPhone.SetActive(false);
+                vrCellPhone.SetActive(true);
              }
              else if(manager.MotionControlsConnected && (!leftMotionController.activeInHierarchy || !rightMotionController.activeInHierarchy)) {
-                 Debug.Log("Motion Controllers not detected - Disabling devices");
-                 manager.MotionControlsConnected = false;
-                 playerCharacter.GetComponent<FirstPersonController>().enabled = true;
-                 playerCharacter.GetComponent<VRPlayerController>().enabled = false;
-             }*/
+                Debug.Log("Motion Controllers not detected - Disabling devices");
+                manager.MotionControlsConnected = false;
+                cellPhone.SetActive(true);
+                vrCellPhone.SetActive(false);
+             }
         }
 
    }

@@ -55,8 +55,8 @@ public class VRPlayerController : MonoBehaviour {
         lc.OnTouchPadTouched += OnLeftTouch;
         lc.OnTouchPadTouchedDown += OnLeftTouch;
         lc.OnTouchPadTouchedUp += OnLeftTouchUp;
-        lc.OnTriggerDown += OnLeftTriggerDown;
-        lc.OnTriggerUp += OnLeftTriggerUp;
+        rc.OnTriggerDown += OnLeftTriggerDown;
+        rc.OnTriggerUp += OnLeftTriggerUp;
 
         stepCycle = 0f;
         nextStep = stepCycle / 2f;
@@ -92,7 +92,7 @@ public class VRPlayerController : MonoBehaviour {
         if (!characterController.isGrounded) {
             moveDir += Physics.gravity * gravityMultiplier * Time.fixedDeltaTime;
         }
-        Debug.Log(moveDir);
+
         characterController.Move(moveDir * Time.fixedDeltaTime);
 
         ProgressFootStepCycle(speed);
