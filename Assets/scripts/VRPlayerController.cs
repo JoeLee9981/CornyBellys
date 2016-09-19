@@ -10,10 +10,9 @@ public class VRPlayerController : MonoBehaviour {
     [SerializeField] private int sneakSpeed = 5;
     [SerializeField] private int runSpeed = 20;
     [SerializeField] [Range(0f, 1f)] private float lengthenRunStep = 0.7f;
-    [SerializeField] private int rotateSpeed = 3;
     [SerializeField] private Vector2 deadzone = new Vector2(0.2f, 0.2f);
     [SerializeField] private float gravityMultiplier = 2;
-    [SerializeField] private float stickToGroundForce = 10;
+    //[SerializeField] private float stickToGroundForce = 10;
     [SerializeField] private Vector2 mouseSensitivity = new Vector2(20, 10);
     [SerializeField] private int smoothing = 10;
     [SerializeField] private Vector2 clampInDegrees = new Vector2(360, 180);
@@ -24,7 +23,9 @@ public class VRPlayerController : MonoBehaviour {
     private Vector2 mouseAbsolute;
     private Vector3 moveDir = Vector3.zero;
     private Vector2 mouseDelta = Vector2.zero;
+    private Vector2 touchPadMouseDelta = Vector2.zero;
     private CharacterController characterController;
+    private Vector2 touchPadInputVector;
     private Vector2 inputVector;
     private bool sprinting;
     private bool altSprinting;
@@ -49,7 +50,11 @@ public class VRPlayerController : MonoBehaviour {
         VR_CustomTrackedController rc = manager.VRControllerRight.GetComponent<VR_CustomTrackedController>();
         VR_CustomTrackedController lc = manager.VRControllerLeft.GetComponent<VR_CustomTrackedController>();
         rc.OnTouchPadTouched += OnRightTouch;
+        rc.OnTouchPadTouchedDown += OnRightTouch;
+        rc.OnTouchPadTouchedUp += OnRightTouchUp;
         lc.OnTouchPadTouched += OnLeftTouch;
+        lc.OnTouchPadTouchedDown += OnLeftTouch;
+        lc.OnTouchPadTouchedUp += OnLeftTouchUp;
         lc.OnTriggerDown += OnLeftTriggerDown;
         lc.OnTriggerUp += OnLeftTriggerUp;
 
@@ -87,14 +92,11 @@ public class VRPlayerController : MonoBehaviour {
         if (!characterController.isGrounded) {
             moveDir += Physics.gravity * gravityMultiplier * Time.fixedDeltaTime;
         }
-
+        Debug.Log(moveDir);
         characterController.Move(moveDir * Time.fixedDeltaTime);
 
-        //ProgressFootStepCycle(speed);
+        ProgressFootStepCycle(speed);
 
-        //zero these vectors to handle input events from motion controls
-        inputVector.x = 0;
-        inputVector.y = 0;
     }
 
     private float HandleInput() {
@@ -104,9 +106,9 @@ public class VRPlayerController : MonoBehaviour {
         float speed = sprinting || altSprinting ? runSpeed : walkSpeed;
         speed = sneaking ? sneakSpeed : speed;
 
-        if (inputVector.x != 0 || inputVector.y != 0) {
+        if (touchPadInputVector.x != 0 || touchPadInputVector.y != 0) {
             //motion control input detected, takes priority
-
+            inputVector = touchPadInputVector;
         }
         else {
             inputVector.x = CrossPlatformInputManager.GetAxis("Horizontal");
@@ -129,9 +131,12 @@ public class VRPlayerController : MonoBehaviour {
             Quaternion targetOrientation = Quaternion.Euler(targetDirection);
             Quaternion targetCharacterOrientation = Quaternion.Euler(targetCharacterDirection);
 
-            if (mouseDelta.x == 0) {
+            if (touchPadMouseDelta.x == 0) {
                 // Get raw mouse input for a cleaner reading on more sensitive mice.
                 mouseDelta = new Vector2(Input.GetAxisRaw("Mouse X"), Input.GetAxisRaw("Mouse Y"));
+            }
+            else {
+                mouseDelta = touchPadMouseDelta;
             }
 
             // Scale input against the sensitivity setting and multiply that against the smoothing value.
@@ -161,9 +166,6 @@ public class VRPlayerController : MonoBehaviour {
             Quaternion yRotation = Quaternion.AngleAxis(mouseAbsolute.x, transform.InverseTransformDirection(Vector3.up));
             transform.localRotation *= yRotation;
 
-            mouseDelta.x = 0;
-            mouseDelta.y = 0;
-            
         }
         else {
             Cursor.lockState = CursorLockMode.None;
@@ -172,10 +174,10 @@ public class VRPlayerController : MonoBehaviour {
     }
 
     private void ProgressFootStepCycle(float speed) {
-        if(!IsSneaking()) {
+        if (!IsSneaking() && (inputVector.x != 0 || inputVector.y != 0)) {
             stepCycle += (characterController.velocity.magnitude + (speed * (sprinting || altSprinting ? lengthenRunStep : 1f))) * Time.fixedDeltaTime;
         }
-        if(stepCycle > nextStep) {
+        if (stepCycle > nextStep) {
             nextStep = stepCycle + footStepInterval;
             HandleFootStepAudio();
         }
@@ -195,17 +197,26 @@ public class VRPlayerController : MonoBehaviour {
 
     public void OnRightTouch(object sender, InputEventArgs e) {
         if (e.touchpad.y > deadzone.y || e.touchpad.y < -deadzone.y) {
-            inputVector.y = e.touchpad.y;
+            touchPadInputVector.y = e.touchpad.y;
         }
         if (e.touchpad.x > deadzone.x || e.touchpad.x < -deadzone.x) {
-            inputVector.x = e.touchpad.x;
+            touchPadInputVector.x = e.touchpad.x;
         }
     }
 
+    public void OnRightTouchUp(object sender, InputEventArgs e) {
+        touchPadInputVector.x = 0;
+        touchPadInputVector.y = 0;
+    }
+
     public void OnLeftTouch(object sender, InputEventArgs e) {
-        if(e.touchpad.x > deadzone.x || e.touchpad.x < -deadzone.x) {
-            mouseDelta.x = e.touchpad.x;
+        if (e.touchpad.x > deadzone.x || e.touchpad.x < -deadzone.x) {
+            touchPadMouseDelta.x = e.touchpad.x;
         }
+    }
+
+    public void OnLeftTouchUp(object sender, InputEventArgs e) {
+        touchPadMouseDelta.x = 0;
     }
 
     public void OnLeftTriggerDown(object sender, InputEventArgs e) {
