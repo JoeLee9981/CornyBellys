@@ -20,6 +20,8 @@ public class VR_CustomTrackedController : MonoBehaviour {
     public event InputEventHandler OnGrip;
     public event InputEventHandler OnGripUp;
     public event InputEventHandler OnTouchPadTouched;
+    public event InputEventHandler OnTouchPadTouchedUp;
+    public event InputEventHandler OnTouchPadTouchedDown;
 
     // Use this for initialization
     void Start() {
@@ -29,6 +31,18 @@ public class VR_CustomTrackedController : MonoBehaviour {
     private void onTouchPadTouched(InputEventArgs e) {
         if (OnTouchPadTouched != null) {
             OnTouchPadTouched(this, e);
+        }
+    }
+
+    private void onTouchPadTouchedUp(InputEventArgs e) {
+        if (OnTouchPadTouchedUp != null) {
+            OnTouchPadTouchedUp(this, e);
+        }
+    }
+
+    private void onTouchPadTouchedDown(InputEventArgs e) {
+        if (OnTouchPadTouchedDown != null) {
+            OnTouchPadTouchedDown(this, e);
         }
     }
 
@@ -62,6 +76,12 @@ public class VR_CustomTrackedController : MonoBehaviour {
         }
     }
 
+    private void onGripUp(InputEventArgs e) {
+        if (OnGripUp != null) {
+            OnGripUp(this, e);
+        }
+    }
+
     // Update is called once per frame
     void Update() {
 
@@ -88,8 +108,18 @@ public class VR_CustomTrackedController : MonoBehaviour {
             e.touchpad = device.GetAxis();
             onTouchPadTouched(e);
         }
+        else if (device.GetTouchUp(SteamVR_Controller.ButtonMask.Touchpad)) {
+            InputEventArgs e;
+            e.touchpad = device.GetAxis();
+            onTouchPadTouchedUp(e);
+        }
+        else if (device.GetTouchDown(SteamVR_Controller.ButtonMask.Touchpad)) {
+            InputEventArgs e;
+            e.touchpad = device.GetAxis();
+            onTouchPadTouchedDown(e);
+        }
 
-        if(device.GetPressDown(SteamVR_Controller.ButtonMask.Grip)) {
+        if (device.GetPressDown(SteamVR_Controller.ButtonMask.Grip)) {
 
         }
         else if(device.GetPress(SteamVR_Controller.ButtonMask.Grip)) {
