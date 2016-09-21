@@ -6,30 +6,55 @@ using UnityStandardAssets.CrossPlatformInput;
 [RequireComponent(typeof(CharacterController))]
 public class VRPlayerController : MonoBehaviour {
 
-    [SerializeField] private int walkSpeed = 10;
-    [SerializeField] private int sneakSpeed = 5;
-    [SerializeField] private int runSpeed = 20;
-    [SerializeField] [Range(0f, 1f)] private float lengthenRunStep = 0.7f;
-    [SerializeField] private Vector2 deadzone = new Vector2(0.2f, 0.2f);
-    [SerializeField] private float gravityMultiplier = 2;
-    //[SerializeField] private float stickToGroundForce = 10;
-    [SerializeField] private Vector2 mouseSensitivity = new Vector2(20, 10);
-    [SerializeField] private int smoothing = 10;
-    [SerializeField] private Vector2 clampInDegrees = new Vector2(360, 180);
-    [SerializeField] private AudioClip[] footStepSounds;
-    [SerializeField] private int footStepInterval;
+    [SerializeField]
+    private int walkSpeed = 10;
+    [SerializeField]
+    private int sneakSpeed = 5;
+    [SerializeField]
+    private int runSpeed = 20;
+    [SerializeField]
+    private float stamina = 100;
+    [SerializeField]
+    private float staminaDrain = 20;
+    [SerializeField]
+    private float staminaRegen = 10;
+    [SerializeField]
+    private float fatigueTime = 5;
+    [SerializeField]
+    [Range(0f, 1f)]
+    private float lengthenRunStep = 0.7f;
+    [SerializeField]
+    private Vector2 deadzone = new Vector2(0.2f, 0.2f);
+    [SerializeField]
+    private float gravityMultiplier = 2;
+    [SerializeField]
+    private Vector2 mouseSensitivity = new Vector2(20, 10);
+    [SerializeField]
+    private int smoothing = 10;
+    [SerializeField]
+    private Vector2 clampInDegrees = new Vector2(360, 180);
+    [SerializeField]
+    private AudioClip[] footStepSounds;
+    [SerializeField]
+    private AudioClip[] longBreaths;
+    [SerializeField]
+    private AudioClip[] shallowBreaths;
+    [SerializeField]
+    private int footStepInterval;
+    [SerializeField]
+    private float breathInterval = 2;
+    [SerializeField]
+    private float shallowBreathInterval = 0.5f;
+    
 
     private Vector2 smoothMouse;
     private Vector2 mouseAbsolute;
     private Vector3 moveDir = Vector3.zero;
     private Vector2 mouseDelta = Vector2.zero;
     private Vector2 touchPadMouseDelta = Vector2.zero;
-    private CharacterController characterController;
+
     private Vector2 touchPadInputVector;
     private Vector2 inputVector;
-    private bool sprinting;
-    private bool altSprinting;
-    private bool sneaking;
     private bool mouseLocked = true;
     private Vector2 targetDirection;
     private Vector2 targetCharacterDirection;
@@ -37,13 +62,19 @@ public class VRPlayerController : MonoBehaviour {
     //footsteps
     private float stepCycle;
     private float nextStep;
-    private AudioSource audioSource;
+    private float breathCycle;
+    private float nextBreath;
 
+    private AudioSource breathAudioSource;
+    private AudioSource footstepAudioSource;
+    private CharacterController characterController;
     private GameManager manager;
+    private PlayerCharacter playerCharacter;
 
     // Use this for initialization
     void Start() {
 
+        playerCharacter = new PlayerCharacter(stamina);
         characterController = GetComponent<CharacterController>();
 
         manager = GameManager.getInstance();
@@ -60,7 +91,9 @@ public class VRPlayerController : MonoBehaviour {
 
         stepCycle = 0f;
         nextStep = stepCycle / 2f;
-        audioSource = GetComponent<AudioSource>();
+        AudioSource[] audioSources = GetComponents<AudioSource>();
+        footstepAudioSource = audioSources[0];
+        breathAudioSource = audioSources[1];
     }
 
     // Update is called once per frame
@@ -73,8 +106,26 @@ public class VRPlayerController : MonoBehaviour {
     }
 
     void FixedUpdate() {
+
         float speed = HandleInput();
 
+        /*
+         *  Handle Exhaustion
+         */
+        if (playerCharacter.Exhausted) {
+            playerCharacter.TimeExhausted += Time.fixedDeltaTime;
+            if (playerCharacter.TimeExhausted > fatigueTime) {
+                playerCharacter.Exhausted = false;
+            }
+            else {
+                speed = walkSpeed;
+            }
+        }
+
+
+        /*
+         *  Handle Input
+         */
         if (inputVector.sqrMagnitude > 1) {
             inputVector.Normalize();
         }
@@ -96,15 +147,29 @@ public class VRPlayerController : MonoBehaviour {
         characterController.Move(moveDir * Time.fixedDeltaTime);
 
         ProgressFootStepCycle(speed);
+        HandleBreathSound();
+
+        /*
+         *  Handle Stamina Drain
+         */
+        if (playerCharacter.IsSprinting()) {
+            playerCharacter.Stamina -= staminaDrain * Time.fixedDeltaTime;
+        }
+        else {
+            playerCharacter.Stamina += staminaRegen * Time.fixedDeltaTime;
+            if (playerCharacter.Stamina > stamina) {
+                playerCharacter.Stamina = stamina;
+            }
+        }
 
     }
 
     private float HandleInput() {
         //sprinting is input from gamepad / keyboard, altsprinting is input from motion controls
-        sprinting = CrossPlatformInputManager.GetButton("Sprint");
-        sneaking = CrossPlatformInputManager.GetButton("Sneak");
-        float speed = sprinting || altSprinting ? runSpeed : walkSpeed;
-        speed = sneaking ? sneakSpeed : speed;
+        playerCharacter.Sprinting = CrossPlatformInputManager.GetButton("Sprint");
+        playerCharacter.Sneaking = CrossPlatformInputManager.GetButton("Sneak");
+        float speed = playerCharacter.IsSprinting() ? runSpeed : walkSpeed;
+        speed = playerCharacter.Sneaking ? sneakSpeed : speed;
 
         if (touchPadInputVector.x != 0 || touchPadInputVector.y != 0) {
             //motion control input detected, takes priority
@@ -175,7 +240,7 @@ public class VRPlayerController : MonoBehaviour {
 
     private void ProgressFootStepCycle(float speed) {
         if (!IsSneaking() && (inputVector.x != 0 || inputVector.y != 0)) {
-            stepCycle += (characterController.velocity.magnitude + (speed * (sprinting || altSprinting ? lengthenRunStep : 1f))) * Time.fixedDeltaTime;
+            stepCycle += (characterController.velocity.magnitude + (speed * (playerCharacter.IsSprinting() ? lengthenRunStep : 1f))) * Time.fixedDeltaTime;
         }
         if (stepCycle > nextStep) {
             nextStep = stepCycle + footStepInterval;
@@ -183,12 +248,34 @@ public class VRPlayerController : MonoBehaviour {
         }
     }
 
+    private void HandleBreathSound() {
+        if (playerCharacter.IsSprinting() || playerCharacter.Exhausted) {
+            breathCycle += Time.fixedDeltaTime;
+        }
+        if (playerCharacter.IsSprinting() && breathCycle > nextBreath) {
+            nextBreath = breathCycle + breathInterval;
+            int n = Random.Range(1, longBreaths.Length);
+            breathAudioSource.clip = longBreaths[n];
+            breathAudioSource.PlayOneShot(breathAudioSource.clip);
+            longBreaths[n] = longBreaths[0];
+            longBreaths[0] = breathAudioSource.clip;
+        }
+        else if(playerCharacter.Exhausted && breathCycle > nextBreath) {
+            nextBreath = breathCycle + shallowBreathInterval;
+            int n = Random.Range(1, shallowBreaths.Length);
+            breathAudioSource.clip = shallowBreaths[n];
+            breathAudioSource.PlayOneShot(breathAudioSource.clip);
+            shallowBreaths[n] = shallowBreaths[0];
+            shallowBreaths[0] = breathAudioSource.clip;
+        }
+    }
+
     private void HandleFootStepAudio() {
         int n = Random.Range(1, footStepSounds.Length);
-        audioSource.clip = footStepSounds[n];
-        audioSource.PlayOneShot(audioSource.clip);
+        footstepAudioSource.clip = footStepSounds[n];
+        footstepAudioSource.PlayOneShot(footstepAudioSource.clip);
         footStepSounds[n] = footStepSounds[0];
-        footStepSounds[0] = audioSource.clip;
+        footStepSounds[0] = footstepAudioSource.clip;
     }
 
     public bool IsSneaking() {
@@ -220,10 +307,10 @@ public class VRPlayerController : MonoBehaviour {
     }
 
     public void OnLeftTriggerDown(object sender, InputEventArgs e) {
-        altSprinting = true;
+        playerCharacter.AltSprinting = true;
     }
 
     public void OnLeftTriggerUp(object sender, InputEventArgs e) {
-        altSprinting = false;
+        playerCharacter.AltSprinting = false;
     }
 }

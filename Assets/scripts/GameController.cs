@@ -12,6 +12,8 @@ public class GameController : MonoBehaviour {
     [SerializeField] private GameObject vrCellPhone;
     [SerializeField] private GameObject cellPhone;
     [SerializeField] private GameObject playerCamera;
+    [SerializeField] private AudioClip bgAudio;
+    private AudioSource audioSource;
 
     void Awake() {
         manager = GameManager.getInstance();
@@ -21,12 +23,15 @@ public class GameController : MonoBehaviour {
             Debug.Log("HMD Detected, set to use VR");
             manager.UseVR = true;
         }
+        
     }
 
 	// Use this for initialization
 	void Start () {
- 
-	}
+        audioSource = GetComponent<AudioSource>();
+        audioSource.clip = bgAudio;
+        audioSource.Play();
+    }
 	
 	// Update is called once per frame
 	void Update () {
@@ -48,6 +53,8 @@ public class GameController : MonoBehaviour {
                 vrCellPhone.SetActive(false);
              }
         }
-
    }
+
+    void FixedUpdate() {
+    }
 }
