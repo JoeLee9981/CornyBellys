@@ -252,7 +252,7 @@ public class VRPlayerController : MonoBehaviour {
         if (playerCharacter.IsSprinting() || playerCharacter.Exhausted) {
             breathCycle += Time.fixedDeltaTime;
         }
-        if (playerCharacter.IsSprinting() && breathCycle > nextBreath) {
+        if (playerCharacter.Exhausted && breathCycle > nextBreath) {
             nextBreath = breathCycle + breathInterval;
             int n = Random.Range(1, longBreaths.Length);
             breathAudioSource.clip = longBreaths[n];
@@ -260,7 +260,7 @@ public class VRPlayerController : MonoBehaviour {
             longBreaths[n] = longBreaths[0];
             longBreaths[0] = breathAudioSource.clip;
         }
-        else if(playerCharacter.Exhausted && breathCycle > nextBreath) {
+        else if(playerCharacter.IsSprinting() && breathCycle > nextBreath) {
             nextBreath = breathCycle + shallowBreathInterval;
             int n = Random.Range(1, shallowBreaths.Length);
             breathAudioSource.clip = shallowBreaths[n];

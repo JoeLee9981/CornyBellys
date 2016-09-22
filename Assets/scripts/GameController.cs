@@ -29,6 +29,7 @@ public class GameController : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
         audioSource = GetComponent<AudioSource>();
+        audioSource.loop = true;
         audioSource.clip = bgAudio;
         audioSource.Play();
     }
