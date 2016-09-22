@@ -21,6 +21,7 @@ public class WindController : MonoBehaviour {
             audioSource.PlayOneShot(audioSource.clip);
             elapsedWindTime += Time.fixedDeltaTime;
             nextWindTime = Random.Range(5, 15) * windInterval;
+            elapsedWindTime = 0;
         }
         else {
             elapsedWindTime += Time.fixedDeltaTime;
