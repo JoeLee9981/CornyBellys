@@ -1,46 +1,47 @@
 fileFormatVersion: 2
 guid: 9eb4d44c898a5514aa7a8bc1c2a8f8a1
-timeCreated: 1474185640
+timeCreated: 1474599794
 licenseType: Free
 ModelImporter:
   serializedVersion: 19
   fileIDToRecycleName:
     100000: //RootNode
-    100002: Camera
-    100004: Lamp
-    100006: Mesh1 Group1 Model
-    100008: Mesh2 Group2 Model
-    100010: Mesh3 Group3 Model
-    100012: Mesh4 Group4 Model
-    100014: Mesh5 Group5 Model
-    100016: Mesh6 Group6 Model
+    100002: group_0
+    100004: group_1
+    100006: group_1.001
+    100008: group_2
+    100010: group_3
+    100012: group_4
+    100014: group_5
     400000: //RootNode
-    400002: Camera
-    400004: Lamp
-    400006: Mesh1 Group1 Model
-    400008: Mesh2 Group2 Model
-    400010: Mesh3 Group3 Model
-    400012: Mesh4 Group4 Model
-    400014: Mesh5 Group5 Model
-    400016: Mesh6 Group6 Model
-    2300000: Mesh1 Group1 Model
-    2300002: Mesh2 Group2 Model
-    2300004: Mesh3 Group3 Model
-    2300006: Mesh4 Group4 Model
-    2300008: Mesh5 Group5 Model
-    2300010: Mesh6 Group6 Model
-    3300000: Mesh1 Group1 Model
-    3300002: Mesh2 Group2 Model
-    3300004: Mesh3 Group3 Model
-    3300006: Mesh4 Group4 Model
-    3300008: Mesh5 Group5 Model
-    3300010: Mesh6 Group6 Model
-    4300000: Mesh1 Group1 Model
-    4300002: Mesh4 Group4 Model
-    4300004: Mesh2 Group2 Model
-    4300006: Mesh3 Group3 Model
-    4300008: Mesh5 Group5 Model
-    4300010: Mesh6 Group6 Model
+    400002: group_0
+    400004: group_1
+    400006: group_1.001
+    400008: group_2
+    400010: group_3
+    400012: group_4
+    400014: group_5
+    2300000: group_0
+    2300002: group_1
+    2300004: group_1.001
+    2300006: group_2
+    2300008: group_3
+    2300010: group_4
+    2300012: group_5
+    3300000: group_0
+    3300002: group_1
+    3300004: group_1.001
+    3300006: group_2
+    3300008: group_3
+    3300010: group_4
+    3300012: group_5
+    4300000: group_5
+    4300002: group_4
+    4300004: group_3
+    4300006: group_2
+    4300008: group_1.001
+    4300010: group_1
+    4300012: group_0
   materials:
     importMaterials: 1
     materialName: 0
