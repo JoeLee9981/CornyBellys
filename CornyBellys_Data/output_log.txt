@@ -1,4 +1,4 @@
-Initialize engine version: 5.4.0f3 (a6d8d714de6f)
+Initialize engine version: 5.4.1f1 (649f48bbbf0f)
 GfxDevice: creating device client; threaded=1
 Direct3D:
     Version:  Direct3D 11.0 [level 11.0]
@@ -16,22 +16,37 @@ Platform assembly: C:\Users\Joe\Documents\CornyBellys\CornyBellys_Data\Managed\U
 Loading C:\Users\Joe\Documents\CornyBellys\CornyBellys_Data\Managed\UnityEngine.UI.dll into Unity Child Domain
 Platform assembly: C:\Users\Joe\Documents\CornyBellys\CornyBellys_Data\Managed\UnityEngine.Networking.dll (this message is harmless)
 Loading C:\Users\Joe\Documents\CornyBellys\CornyBellys_Data\Managed\UnityEngine.Networking.dll into Unity Child Domain
-- Completed reload, in  0.029 seconds
+- Completed reload, in  0.034 seconds
 Platform assembly: C:\Users\Joe\Documents\CornyBellys\CornyBellys_Data\Managed\System.Core.dll (this message is harmless)
 Platform assembly: C:\Users\Joe\Documents\CornyBellys\CornyBellys_Data\Managed\System.dll (this message is harmless)
 <RI> Initializing input.
 <RI> Input initialized.
 desktop: 2560x1440 59Hz; virtual: 4480x1440 at 0,0
 <RI> Initialized touch support.
-Failed to create Oculus Session.Compositor failed to initialize.Failed to create Oculus Session.Compositor failed to initialize.VR: OpenVR ERROR! Compositor failed initialization with error code VRInitError_IPC_CompositorInvalidConnectResponse: "Shared IPC Compositor Invalid Connect Response (307)"!
+ovr_Create(&m_session, &luid) failed: The given HMD doesn't exist.
+Failed to create Oculus Session.Compositor failed to initialize.ovr_Create(&m_session, &luid) failed: The given HMD doesn't exist.
+Failed to create Oculus Session.Compositor failed to initialize.OpenVR initialized!
  
-(Filename:  Line: 307)
+(Filename:  Line: 347)
 
-UnloadTime: 0.719458 ms
+[VRDevice] Successfully created device OpenVR.
+UnloadTime: 0.536016 ms
+Connected to lighthouse:LHR-55857C81
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebugBindings.gen.cpp Line: 42)
+
 HMD Detected, set to use VR
  
 (Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebugBindings.gen.cpp Line: 42)
 
+Activating VR
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebugBindings.gen.cpp Line: 42)
+
 Setting up 2 worker threads for Enlighten.
-  Thread -> id: 3e4c -> priority: 1 
-  Thread -> id: 12f0 -> priority: 1 
+  Thread -> id: df4 -> priority: 1 
+  Thread -> id: 2dec -> priority: 1 
+OpenVR Shutdown
+ 
+(Filename:  Line: 701)
+
