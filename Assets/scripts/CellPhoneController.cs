@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityStandardAssets.CrossPlatformInput;
 
 public class CellPhoneController : MonoBehaviour {
 
@@ -19,7 +20,9 @@ public class CellPhoneController : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-	    
+	    if(CrossPlatformInputManager.GetButtonDown("FlashLight")) {
+            flashLight.SetActive(!flashLight.activeSelf);
+        }
 	}
 
     public void OnTriggerDown(object sender, InputEventArgs e) {

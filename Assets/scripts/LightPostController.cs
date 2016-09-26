@@ -50,7 +50,7 @@ public class LightPostController : MonoBehaviour {
                     //light is on, flicker it off
                     flickeringActive = false;
                     //set interval to set steady next
-                    nextFlickerInterval = Random.Range(0.1f, flickerInterval);
+                    nextFlickerInterval = Random.Range(0.1f, steadyInterval);
                     //set time to change next individual flicker
                     nextFlickerTime = Random.Range(0.025f, maxFlickerDuration);
                     //flicker the light
@@ -61,7 +61,7 @@ public class LightPostController : MonoBehaviour {
                     //light is off, set it to steady
                     flickeringActive = true;
                     //set interval to activate flickering next
-                    nextFlickerInterval = Random.Range(0.1f, steadyInterval);
+                    nextFlickerInterval = Random.Range(0.1f, flickerInterval);
                 }
                 elapsedFlickerInterval = 0;
             }
