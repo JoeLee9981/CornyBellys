@@ -94,6 +94,7 @@ public class VRPlayerController : MonoBehaviour {
         AudioSource[] audioSources = GetComponents<AudioSource>();
         footstepAudioSource = audioSources[0];
         breathAudioSource = audioSources[1];
+        manager.PlayerCharacter = this;
     }
 
     // Update is called once per frame

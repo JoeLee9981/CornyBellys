@@ -12,6 +12,7 @@ public class GameManager {
     public bool MotionControlsConnected { get; set; }
     public GameObject VRControllerRight { get; set; }
     public GameObject VRControllerLeft { get; set; }
+    public VRPlayerController PlayerCharacter { get; set; }
 
     private GameManager() {
     }
