@@ -40,6 +40,7 @@ public class GameController : MonoBehaviour {
             if (!manager.VRActive && SteamVR.active) {
                 Debug.Log("Activating VR");
                 manager.VRActive = true;
+                manager.PlayerCharacter.GetComponent<CharacterController>().height = 0;
             }
             if (!manager.MotionControlsConnected && leftMotionController.activeInHierarchy && rightMotionController.activeInHierarchy) {
                 Debug.Log("Motion Controllers detected - Connecting devices");

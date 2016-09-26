@@ -73,11 +73,10 @@ public class VRPlayerController : MonoBehaviour {
 
     // Use this for initialization
     void Start() {
-
+        manager = GameManager.getInstance();
         playerCharacter = new PlayerCharacter(stamina);
         characterController = GetComponent<CharacterController>();
-
-        manager = GameManager.getInstance();
+        
         VR_CustomTrackedController rc = manager.VRControllerRight.GetComponent<VR_CustomTrackedController>();
         VR_CustomTrackedController lc = manager.VRControllerLeft.GetComponent<VR_CustomTrackedController>();
         rc.OnTouchPadTouched += OnRightTouch;
