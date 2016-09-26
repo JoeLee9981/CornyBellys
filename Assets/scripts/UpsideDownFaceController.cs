@@ -24,15 +24,17 @@ public class UpsideDownFaceController : MonoBehaviour {
     private float timeOutOfLos;
     private GameManager manager;
     private int waypointIndex;
+    private float halfViewAngle;
 
 	// Use this for initialization
 	void Start () {
         manager = GameManager.getInstance();
         waypointIndex = 0;
+        halfViewAngle = seeAngle / 2;
 	}
-	
-	// Update is called once per frame
-	void Update () {
+
+    // Update is called once per frame
+    void Update() {
         bool playerLOS = false;
         VRPlayerController player = manager.PlayerCharacter;
         NavMeshAgent agent = GetComponent<NavMeshAgent>();
@@ -40,11 +42,17 @@ public class UpsideDownFaceController : MonoBehaviour {
         float playerDistance = Vector3.Distance(transform.position, player.transform.position);
         Vector3 playerDirection = player.transform.position - this.transform.position;
 
-        if(playerDistance < seeDistance) {
+        if (playerDistance < hearDistance && !player.IsSneaking()) {
+            playerLOS = OnPlayerHeard(agent, player);
+        }
+        else if(playerDistance < seeDistance) {
             RaycastHit hit;
             if(Physics.Raycast(transform.position, playerDirection, out hit)) {
                 if(hit.transform == player.transform) {
-                    playerLOS = OnPlayerLineOfSight(agent, player);
+                    float angleToPlayer = Vector3.Angle(playerDirection, transform.forward);
+                    if(angleToPlayer > -halfViewAngle && angleToPlayer < halfViewAngle) { 
+                        playerLOS = OnPlayerLineOfSight(agent, player);
+                    }
                 }
             }
         }
@@ -82,8 +90,12 @@ public class UpsideDownFaceController : MonoBehaviour {
         return true;
     }
 
-    public virtual void OnPlayerHear() {
-
+    public virtual bool OnPlayerHeard(NavMeshAgent agent, VRPlayerController player) {
+        agent.destination = player.transform.position;
+        playerDetected = true;
+        agent.speed = runSpeed;
+        timeOutOfLos = 0;
+        return true;
     }
 
     public virtual void OnWaypointReached() {

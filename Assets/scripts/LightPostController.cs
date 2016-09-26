@@ -7,9 +7,11 @@ public class LightPostController : MonoBehaviour {
     //duration of flickering
     [SerializeField] private float flickerInterval = 1;
     //duration of steady light
-    [SerializeField] private float steadyInterval = 1.5f;
+    [SerializeField] private float steadyInterval = 3;
     //duration of individual flicker
     [SerializeField] private float maxFlickerDuration = 0.1f;
+    //minimum duration of steady
+    [SerializeField] private float minimumSteadyInterval = 1;
 
     private Renderer lightBulb;
     private Light light;
@@ -24,6 +26,8 @@ public class LightPostController : MonoBehaviour {
     private float nextFlickerTime;
     //next interval to switch from flicker to steady
     private float nextFlickerInterval;
+    //original emission color;
+    private Color emissionColor;
 
 	// Use this for initialization
 	void Start () {
@@ -40,7 +44,8 @@ public class LightPostController : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
         if(lightBulb == null) {
-            lightBulb = transform.Find("Bulb").GetComponent<Renderer>();
+            lightBulb = transform.Find("Lamp").GetComponent<Renderer>();
+            emissionColor = lightBulb.material.color;
         }
         Material material = lightBulb.material;
         
@@ -50,25 +55,27 @@ public class LightPostController : MonoBehaviour {
                     //light is on, flicker it off
                     flickeringActive = false;
                     //set interval to set steady next
-                    nextFlickerInterval = Random.Range(0.1f, steadyInterval);
+                    nextFlickerInterval = Random.Range(minimumSteadyInterval, steadyInterval);
                     //set time to change next individual flicker
                     nextFlickerTime = Random.Range(0.025f, maxFlickerDuration);
-                    //flicker the light
-                    light.intensity = 0;
-                    material.SetColor("_EmissionColor", Color.white);
+                    //Set the light to steady
+                    light.intensity = lightIntensity;
+                    material.SetColor("_EmissionColor", emissionColor);
                 }
                 else {
                     //light is off, set it to steady
                     flickeringActive = true;
                     //set interval to activate flickering next
                     nextFlickerInterval = Random.Range(0.1f, flickerInterval);
+                    light.intensity = 0;
+                    material.SetColor("_EmissionColor", Color.black);
                 }
                 elapsedFlickerInterval = 0;
             }
-            else if (!flickeringActive && elapsedFlickerTime > nextFlickerTime) {
+            else if (flickeringActive && elapsedFlickerTime > nextFlickerTime) {
                 //flicker the light
                 light.intensity = light.intensity == 0 ? lightIntensity : 0;
-                material.SetColor("_EmissionColor", light.intensity == 0 ? Color.black : Color.white);
+                material.SetColor("_EmissionColor", light.intensity == 0 ? Color.black : emissionColor);
                 //set the next flicker time
                 nextFlickerTime = Random.Range(0.025f, maxFlickerDuration);
                 elapsedFlickerTime = 0;
