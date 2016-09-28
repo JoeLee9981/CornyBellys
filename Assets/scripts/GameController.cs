@@ -23,7 +23,7 @@ public class GameController : MonoBehaviour {
             Debug.Log("HMD Detected, set to use VR");
             manager.UseVR = true;
         }
-        
+        manager.CellPhone = cellPhone;
     }
 
 	// Use this for initialization
@@ -45,12 +45,14 @@ public class GameController : MonoBehaviour {
             if (!manager.MotionControlsConnected && leftMotionController.activeInHierarchy && rightMotionController.activeInHierarchy) {
                 Debug.Log("Motion Controllers detected - Connecting devices");
                 manager.MotionControlsConnected = true;
+                manager.CellPhone = vrCellPhone;
                 cellPhone.SetActive(false);
                 vrCellPhone.SetActive(true);
              }
              else if(manager.MotionControlsConnected && (!leftMotionController.activeInHierarchy || !rightMotionController.activeInHierarchy)) {
                 Debug.Log("Motion Controllers not detected - Disabling devices");
                 manager.MotionControlsConnected = false;
+                manager.CellPhone = cellPhone;
                 cellPhone.SetActive(true);
                 vrCellPhone.SetActive(false);
              }

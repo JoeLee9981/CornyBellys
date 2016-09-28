@@ -13,6 +13,8 @@ public class GameManager {
     public GameObject VRControllerRight { get; set; }
     public GameObject VRControllerLeft { get; set; }
     public VRPlayerController PlayerCharacter { get; set; }
+    public GameObject CellPhone { get; set; }
+    public bool IsPaused { get; set; }
 
     private GameManager() {
     }
@@ -23,5 +25,4 @@ public class GameManager {
         }
         return instance;
     }
-
 }
