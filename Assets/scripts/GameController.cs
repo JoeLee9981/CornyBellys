@@ -19,6 +19,7 @@ public class GameController : MonoBehaviour {
         manager = GameManager.getInstance();
         manager.VRControllerLeft = leftMotionController;
         manager.VRControllerRight = rightMotionController;
+        manager.InputManager = new VRCustomInputManager();
         if (OpenVR.IsHmdPresent()) {
             Debug.Log("HMD Detected, set to use VR");
             manager.UseVR = true;

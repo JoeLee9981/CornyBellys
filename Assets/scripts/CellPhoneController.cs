@@ -10,22 +10,14 @@ public class CellPhoneController : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-
-        if(isMotionControlled) { 
-            manager = GameManager.getInstance();
-            VR_CustomTrackedController lc = manager.VRControllerLeft.GetComponent<VR_CustomTrackedController>();
-            lc.OnTriggerDown += OnTriggerDown;
-        }
+        manager = GameManager.getInstance();
     }
 	
 	// Update is called once per frame
 	void Update () {
-	    if(CrossPlatformInputManager.GetButtonDown("FlashLight")) {
+        int leftIndex = (int)manager.VRControllerLeft.GetComponent<SteamVR_TrackedObject>().index;
+	    if(manager.InputManager.GetInputDown(VRCustomInputManager.FLASHLIGHT, leftIndex)) {
             flashLight.SetActive(!flashLight.activeSelf);
         }
 	}
-
-    public void OnTriggerDown(object sender, InputEventArgs e) {
-        flashLight.SetActive(!flashLight.activeSelf);
-    }
 }

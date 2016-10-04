@@ -71,22 +71,15 @@ public class VRPlayerController : MonoBehaviour {
     private GameManager manager;
     private PlayerCharacter playerCharacter;
 
+    private VRCustomInputManager inputManager;
+
     // Use this for initialization
     void Start() {
         manager = GameManager.getInstance();
         playerCharacter = new PlayerCharacter(stamina);
         characterController = GetComponent<CharacterController>();
-        
-        VR_CustomTrackedController rc = manager.VRControllerRight.GetComponent<VR_CustomTrackedController>();
-        VR_CustomTrackedController lc = manager.VRControllerLeft.GetComponent<VR_CustomTrackedController>();
-        rc.OnTouchPadTouched += OnRightTouch;
-        rc.OnTouchPadTouchedDown += OnRightTouch;
-        rc.OnTouchPadTouchedUp += OnRightTouchUp;
-        lc.OnTouchPadTouched += OnLeftTouch;
-        lc.OnTouchPadTouchedDown += OnLeftTouch;
-        lc.OnTouchPadTouchedUp += OnLeftTouchUp;
-        rc.OnTriggerDown += OnLeftTriggerDown;
-        rc.OnTriggerUp += OnLeftTriggerUp;
+
+        inputManager = manager.InputManager;
 
         stepCycle = 0f;
         nextStep = stepCycle / 2f;
@@ -98,16 +91,19 @@ public class VRPlayerController : MonoBehaviour {
 
     // Update is called once per frame
     void Update() {
-        MouseLook();
+        int leftIndex = (int)manager.VRControllerLeft.GetComponent<SteamVR_TrackedObject>().index;
+        int rightIndex = (int)manager.VRControllerRight.GetComponent<SteamVR_TrackedObject>().index;
+        MouseLook(leftIndex, rightIndex);
         if (characterController.isGrounded) {
             moveDir.y = 0;
         }
-
     }
 
     void FixedUpdate() {
 
-        float speed = HandleInput();
+        int leftIndex = (int)manager.VRControllerLeft.GetComponent<SteamVR_TrackedObject>().index;
+        int rightIndex = (int)manager.VRControllerRight.GetComponent<SteamVR_TrackedObject>().index;
+        float speed = HandleInput(leftIndex, rightIndex);
 
         /*
          *  Handle Exhaustion
@@ -164,27 +160,28 @@ public class VRPlayerController : MonoBehaviour {
 
     }
 
-    private float HandleInput() {
+    private float HandleInput(int leftIndex, int rightIndex) {
         //sprinting is input from gamepad / keyboard, altsprinting is input from motion controls
-        playerCharacter.Sprinting = CrossPlatformInputManager.GetButton("Sprint");
-        playerCharacter.Sneaking = CrossPlatformInputManager.GetButton("Sneak");
+        playerCharacter.Sprinting = inputManager.GetInput(VRCustomInputManager.SPRINT, rightIndex);
+        playerCharacter.Sneaking = inputManager.GetInput(VRCustomInputManager.SNEAK, rightIndex);
         float speed = playerCharacter.IsSprinting() ? runSpeed : walkSpeed;
         speed = playerCharacter.Sneaking ? sneakSpeed : speed;
 
-        if (touchPadInputVector.x != 0 || touchPadInputVector.y != 0) {
+        //if (touchPadInputVector.x != 0 || touchPadInputVector.y != 0) {
             //motion control input detected, takes priority
-            inputVector = touchPadInputVector;
-        }
-        else {
-            inputVector.x = CrossPlatformInputManager.GetAxis("Horizontal");
-            inputVector.y = CrossPlatformInputManager.GetAxis("Vertical");
-        }
+            //inputVector = touchPadInputVector;
+        //}
+       // else {
+            //inputVector.x = CrossPlatformInputManager.GetAxis("Horizontal");
+            //inputVector.y = CrossPlatformInputManager.GetAxis("Vertical");
+            inputManager.GetLeftAxis(out inputVector, leftIndex);
+       // }
 
         return speed;
     }
 
-    public void MouseLook() {
-        if (Input.GetKeyDown(KeyCode.Escape)) {
+    public void MouseLook(int leftIndex, int rightIndex) {
+        if (inputManager.GetInputDown(VRCustomInputManager.CANCEL)) {
             mouseLocked = !mouseLocked;
         }
 
@@ -198,7 +195,7 @@ public class VRPlayerController : MonoBehaviour {
 
             if (touchPadMouseDelta.x == 0) {
                 // Get raw mouse input for a cleaner reading on more sensitive mice.
-                mouseDelta = new Vector2(Input.GetAxisRaw("Mouse X"), Input.GetAxisRaw("Mouse Y"));
+                inputManager.GetRightAxis(out mouseDelta, rightIndex);
             }
             else {
                 mouseDelta = touchPadMouseDelta;
@@ -281,7 +278,7 @@ public class VRPlayerController : MonoBehaviour {
     public bool IsSneaking() {
         return characterController.velocity.magnitude < 6f;
     }
-
+    /*
     public void OnRightTouch(object sender, InputEventArgs e) {
         if (e.touchpad.y > deadzone.y || e.touchpad.y < -deadzone.y) {
             touchPadInputVector.y = e.touchpad.y;
@@ -312,5 +309,5 @@ public class VRPlayerController : MonoBehaviour {
 
     public void OnLeftTriggerUp(object sender, InputEventArgs e) {
         playerCharacter.AltSprinting = false;
-    }
+    }*/
 }

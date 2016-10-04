@@ -14,6 +14,7 @@ public class GameManager {
     public GameObject VRControllerLeft { get; set; }
     public VRPlayerController PlayerCharacter { get; set; }
     public GameObject CellPhone { get; set; }
+    public VRCustomInputManager InputManager { get; set; }
     public bool IsPaused { get; set; }
 
     private GameManager() {
