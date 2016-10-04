@@ -37,6 +37,11 @@ public class BasicEnemyController : MonoBehaviour {
 
     // Update is called once per frame
     void Update() {
+
+        if(!manager.IsGameAcitve()) {
+            return;
+        }
+
         bool playerLOS = false;
 
         VRPlayerController player = manager.PlayerCharacter;
@@ -146,4 +151,5 @@ public class BasicEnemyController : MonoBehaviour {
     public virtual bool OnFlashLightLeave(NavMeshAgent agent, VRPlayerController player) {
         return false;
     }
+
 }

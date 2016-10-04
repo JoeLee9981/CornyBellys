@@ -16,6 +16,11 @@ public class WindController : MonoBehaviour {
 	
 	// Update is called once per frame
 	void FixedUpdate () {
+
+        if (!GameManager.getInstance().IsGameAcitve()) {
+            return;
+        }
+
         if (nextWindTime < elapsedWindTime) {
             audioSource.clip = windAudio;
             audioSource.PlayOneShot(audioSource.clip);

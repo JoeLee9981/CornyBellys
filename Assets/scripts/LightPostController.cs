@@ -43,6 +43,11 @@ public class LightPostController : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+
+        if(!GameManager.getInstance().IsGameAcitve()) {
+            return;
+        }
+
         if(lightBulb == null) {
             lightBulb = transform.Find("Lamp").GetComponent<Renderer>();
             emissionColor = lightBulb.material.color;

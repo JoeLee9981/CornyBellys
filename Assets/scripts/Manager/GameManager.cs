@@ -3,7 +3,11 @@ using System.Collections;
 
 public class GameManager {
 
+    public delegate void GameOverHandler();
+
     private static GameManager instance;
+
+    public event GameOverHandler OnGameOver;
 
     public bool VRActive { get; set; }
     public bool UseVR { get; set; }
@@ -16,8 +20,11 @@ public class GameManager {
     public GameObject CellPhone { get; set; }
     public VRCustomInputManager InputManager { get; set; }
     public bool IsPaused { get; set; }
+    public bool GameOver { get; set; }
 
     private GameManager() {
+        IsPaused = false;
+        GameOver = false;
     }
 
     public static GameManager getInstance() {
@@ -25,5 +32,15 @@ public class GameManager {
             instance = new GameManager();
         }
         return instance;
+    }
+
+    public bool IsGameAcitve() {
+        return !IsPaused && !GameOver;
+    }
+
+    public void TriggerGameOver() {
+        if(OnGameOver != null) {
+            OnGameOver();
+        }
     }
 }

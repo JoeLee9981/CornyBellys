@@ -76,6 +76,7 @@ public class VRPlayerController : MonoBehaviour {
     // Use this for initialization
     void Start() {
         manager = GameManager.getInstance();
+        manager.OnGameOver += () => Debug.Log("Game Over");
         playerCharacter = new PlayerCharacter(stamina);
         characterController = GetComponent<CharacterController>();
 
@@ -91,6 +92,11 @@ public class VRPlayerController : MonoBehaviour {
 
     // Update is called once per frame
     void Update() {
+
+        if(!manager.IsGameAcitve()) {
+            return;
+        }
+
         int leftIndex = (int)manager.VRControllerLeft.GetComponent<SteamVR_TrackedObject>().index;
         int rightIndex = (int)manager.VRControllerRight.GetComponent<SteamVR_TrackedObject>().index;
         MouseLook(leftIndex, rightIndex);
@@ -100,6 +106,10 @@ public class VRPlayerController : MonoBehaviour {
     }
 
     void FixedUpdate() {
+
+        if (!manager.IsGameAcitve()) {
+            return;
+        }
 
         int leftIndex = (int)manager.VRControllerLeft.GetComponent<SteamVR_TrackedObject>().index;
         int rightIndex = (int)manager.VRControllerRight.GetComponent<SteamVR_TrackedObject>().index;
@@ -164,19 +174,12 @@ public class VRPlayerController : MonoBehaviour {
         //sprinting is input from gamepad / keyboard, altsprinting is input from motion controls
         playerCharacter.Sprinting = inputManager.GetInput(VRCustomInputManager.SPRINT, rightIndex);
         playerCharacter.Sneaking = inputManager.GetInput(VRCustomInputManager.SNEAK, rightIndex);
+
         float speed = playerCharacter.IsSprinting() ? runSpeed : walkSpeed;
         speed = playerCharacter.Sneaking ? sneakSpeed : speed;
 
-        //if (touchPadInputVector.x != 0 || touchPadInputVector.y != 0) {
-            //motion control input detected, takes priority
-            //inputVector = touchPadInputVector;
-        //}
-       // else {
-            //inputVector.x = CrossPlatformInputManager.GetAxis("Horizontal");
-            //inputVector.y = CrossPlatformInputManager.GetAxis("Vertical");
-            inputManager.GetLeftAxis(out inputVector, leftIndex);
-       // }
-
+        inputManager.GetLeftAxis(out inputVector, leftIndex);
+ 
         return speed;
     }
 
@@ -277,6 +280,12 @@ public class VRPlayerController : MonoBehaviour {
 
     public bool IsSneaking() {
         return characterController.velocity.magnitude < 6f;
+    }
+
+    void OnControllerColliderHit(ControllerColliderHit hit) {
+        if(hit.gameObject.name == "UpsideDownFace") {
+            Debug.Log("COLLISION OMG OMG OMG");
+        }
     }
     /*
     public void OnRightTouch(object sender, InputEventArgs e) {

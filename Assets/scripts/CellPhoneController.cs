@@ -15,6 +15,11 @@ public class CellPhoneController : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+
+        if(!manager.IsGameAcitve()) {
+            return;
+        }
+
         int leftIndex = (int)manager.VRControllerLeft.GetComponent<SteamVR_TrackedObject>().index;
 	    if(manager.InputManager.GetInputDown(VRCustomInputManager.FLASHLIGHT, leftIndex)) {
             flashLight.SetActive(!flashLight.activeSelf);

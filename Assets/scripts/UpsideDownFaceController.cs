@@ -15,4 +15,10 @@ public class UpsideDownFaceController : BasicEnemyController {
         agent.speed = runSpeed;
         return false;
     }
+
+    void OnTriggerEnter(Collider collider) {
+        if (collider.gameObject.name == "FPSController") {
+            manager.TriggerGameOver();
+        }
+    }
 }
